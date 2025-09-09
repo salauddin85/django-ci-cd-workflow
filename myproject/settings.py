@@ -14,6 +14,14 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'django-ci-cd-workflow.onrender.com',  # <-- Add your Render URL
+]
+CSRF_TRUSTED_ORIGINS = [
+    'http://django-ci-cd-workflow.onrender.com',  # <-- Add your Render URL with scheme
+]
 
 
 # Quick-start development settings - unsuitable for production
