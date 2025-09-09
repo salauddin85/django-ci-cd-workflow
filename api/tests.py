@@ -24,4 +24,4 @@ class ItemAPITestCase(TestCase):
         response = self.client.get("/api/items/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["name"], "Test Item")
+        self.assertEqual(response.data[0]["names"], "Test Item")
