@@ -3,68 +3,68 @@ name: Django CI/CD
 # Workflow triggers
 on:
   push:
-    branches: [ main ]        # main branch-এ push হলে trigger হবে
+    branches: [ main ]        # Trigger when code is pushed to main branch
   pull_request:
-    branches: [ main ]        # main branch-এ PR হলে trigger হবে
+    branches: [ main ]        # Trigger when a PR targets main branch
 
 jobs:
   # ---------------------------
   # Job 1: Test
   # ---------------------------
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    # Use latest Ubuntu environment
 
     steps:
-    # 1️⃣ Checkout code
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    # 2️⃣ Setup Python
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.12
+      # 2️⃣ Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
 
-    # 3️⃣ Install dependencies
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      # 3️⃣ Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    # 4️⃣ Run Django tests
-    - name: Run Django Tests
-      run: python manage.py test
+      # 4️⃣ Run Django tests
+      - name: Run Django Tests
+        run: python manage.py test
 
   # ---------------------------
   # Job 2: Deploy
   # ---------------------------
   deploy:
-    needs: test                     # test job সফল হলে deploy হবে
+    needs: test                     # Deploy only if tests pass
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # শুধুমাত্র main branch-এর জন্য
+    if: github.ref == 'refs/heads/main'  # Run only for main branch
 
     steps:
-    # 1️⃣ Checkout code again
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # 1️⃣ Checkout code again (jobs are isolated)
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    # 2️⃣ Setup Python
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.12
+      # 2️⃣ Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
 
-    # 3️⃣ Install dependencies
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      # 3️⃣ Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    # 4️⃣ Deploy to Render
-    - name: Deploy to Render
-      env:
-        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}        # GitHub Secrets থেকে
-        RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}  # GitHub Secrets থেকে
-      run: |
-        curl -X POST https://api.render.com/deploy/srv-${{ env.RENDER_SERVICE_ID }} \
-        -H "Authorization: Bearer $RENDER_API_KEY"
+      # 4️⃣ Deploy to Render
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}        # Stored in GitHub Secrets
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}  # Stored in GitHub Secrets
+        run: |
+          curl -X POST https://api.render.com/deploy/srv-${{ env.RENDER_SERVICE_ID }} \
+          -H "Authorization: Bearer $RENDER_API_KEY"
