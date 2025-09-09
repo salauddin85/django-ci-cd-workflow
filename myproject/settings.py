@@ -17,10 +17,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'django-ci-cd-workflow.onrender.com',  # <-- Add your Render URL
+    # 'django-ci-cd-workflow.onrender.com',  # <-- Add your Render URL
 ]
 CSRF_TRUSTED_ORIGINS = [
-    'http://django-ci-cd-workflow.onrender.com',  # <-- Add your Render URL with scheme
+    'http://localhost',
+    'http://127.0.0.1',
+    # 'http://django-ci-cd-workflow.onrender.com',  # <-- Add your Render URL with scheme
 ]
 
 
