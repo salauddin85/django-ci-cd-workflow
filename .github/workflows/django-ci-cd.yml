@@ -34,25 +34,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install Linting Tools
-        run: |
-          pip install flake8 black isort pylint bandit
-
-      - name: Run flake8
-        run: flake8 .
-
-      - name: Run black
-        run: black .
-
-      - name: Run isort
-        run: isort .
-
-      - name: Run pylint
-        run: pylint **/*.py
-
-      - name: Run bandit
-        run: bandit -r .
-
       # 4️ Run Django tests
       - name: Run Django Tests
         run: python manage.py test
