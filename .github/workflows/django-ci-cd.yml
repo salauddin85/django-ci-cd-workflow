@@ -2,9 +2,9 @@ name: Django CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   # ---------------------------
@@ -35,7 +35,6 @@ jobs:
           pip install -r requirements.txt
           pip install coverage codecov 
           pip install pytest pytest-django
-          
 
       # 4️⃣ Run Django tests with coverage
       - name: Run Django Tests with Coverage
@@ -45,12 +44,11 @@ jobs:
           coverage report # show coverage in workflow logs
 
       # 5️⃣ Upload coverage to Codecov
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
-          files: coverage.xml
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }} # GitHub Secret
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   # ---------------------------
   # Job 2: Deploy (only if tests pass on all matrix jobs)
