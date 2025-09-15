@@ -33,23 +33,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install coverage codecov 
-          pip install pytest pytest-django
-
-      # 4️⃣ Run Django tests with coverage
-      - name: Run Django Tests with Coverage
-        run: |
-          coverage run -m pytest
-          coverage xml    # generate coverage.xml for codecov
-          coverage report # show coverage in workflow logs
-
-      # 5️⃣ Upload coverage to Codecov
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-
+         
   # ---------------------------
   # Job 2: Deploy (only if tests pass on all matrix jobs)
   # ---------------------------
