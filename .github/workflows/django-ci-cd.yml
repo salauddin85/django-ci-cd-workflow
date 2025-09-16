@@ -59,7 +59,7 @@ jobs:
       - name: Upload test logs
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: test-logs-${{ github.run_id }}  # unique per workflow run
           path: coverage.xml
 
   # ---------------------------
