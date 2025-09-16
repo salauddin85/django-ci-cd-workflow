@@ -48,9 +48,10 @@ jobs:
       # -----------------------
       - name: Run Django Tests with Coverage
         run: |
-          pip install coverage
-          coverage run --source='.' manage.py test
-          coverage report
+            pip install coverage
+            coverage run --source='.' manage.py test
+            coverage report
+            coverage xml
 
       # -----------------------
       # Upload test logs / artifacts
