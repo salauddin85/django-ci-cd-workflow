@@ -29,6 +29,15 @@ class ItemListCreateAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete (self, request, pk):
+        try:
+            item = Item.objects.get(pk=pk)
+        except Item.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 class SingleItemDetailAPIView(APIView):
     def get(self, request, pk):
         try:
