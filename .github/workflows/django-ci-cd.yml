@@ -68,8 +68,9 @@ jobs:
   # ---------------------------
   # Job 3: Dev Check (manual)
   # ---------------------------
+    
   dev-check:
-    if: github.event_name == 'workflow_dispatch'   # Only manual trigger
+    if: github.ref == 'refs/heads/dev'   # Auto run on dev branch push
     runs-on: ubuntu-latest
     strategy:
       matrix:
