@@ -2,10 +2,10 @@ name: Django CI/CD - Dev & Production
 
 on:
   push:
-    branches: [main]      # Only main triggers production deploy
+    branches: [main,dev]      # Only main triggers production deploy
   workflow_dispatch:      # Manual trigger for dev
   pull_request:
-    branches: [main]
+    branches: [main,dev]
 
 jobs:
   # ---------------------------
