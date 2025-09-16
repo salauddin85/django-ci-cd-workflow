@@ -2,14 +2,14 @@ name: Django CI/CD - Dev & Production
 
 on:
   push:
-    branches: [main,dev]      # Only main triggers production deploy
-  workflow_dispatch:      # Manual trigger for dev
+    branches: [main, dev]      # Only main triggers production deploy
+  workflow_dispatch:           # Manual trigger for dev
   pull_request:
-    branches: [main,dev]
+    branches: [main, dev]
 
 jobs:
   # ---------------------------
-  # Job 1: Test (matrix build with coverage)
+  # Job 1: Test + Coverage
   # ---------------------------
   test:
     strategy:
@@ -27,21 +27,47 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # -----------------------
+      # Cache pip dependencies
+      # -----------------------
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Django Tests
-        run: python manage.py test
+      # -----------------------
+      # Run Django Tests + Coverage
+      # -----------------------
+      - name: Run Django Tests with Coverage
+        run: |
+          pip install coverage
+          coverage run --source='.' manage.py test
+          coverage report
+
+      # -----------------------
+      # Upload test logs / artifacts
+      # -----------------------
+      - name: Upload test logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-logs
+          path: coverage.xml
 
   # ---------------------------
-  # Job 2: Deploy (only production)
+  # Job 2: Deploy Production (Blue-Green + Rollback - Dummy Testing)
   # ---------------------------
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # Only deploy for main branch
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout repository
@@ -57,20 +83,40 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Deploy to Render
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+      # -----------------------
+      # Simulated Blue-Green Deploy
+      # -----------------------
+      - name: Deploy to Green Environment (Simulation)
         run: |
-          curl -X POST https://api.render.com/deploy/srv-${{ env.RENDER_SERVICE_ID }} \
-          -H "Authorization: Bearer $RENDER_API_KEY"
+          echo "🚀 Simulating deploy to Green environment..."
+          sleep 2
+          echo "Deployment simulation done!"
+
+      - name: Simulated Health Check Green
+        run: |
+          echo "🔎 Simulating Green environment health check..."
+          sleep 2
+          echo "✅ Green environment healthy (simulation)"
+
+      - name: Switch Traffic (Blue → Green) Simulation
+        run: |
+          echo "🔄 Simulating traffic switch from Blue to Green..."
+          sleep 2
+          echo "Traffic switch simulation done!"
+
+      - name: Rollback if Green Fails Simulation
+        if: failure()
+        run: |
+          echo "⚠️ Simulating rollback to Blue environment..."
+          sleep 2
+          echo "Rollback simulation done!"
+          exit 1
 
   # ---------------------------
   # Job 3: Dev Check (manual)
   # ---------------------------
-    
   dev-check:
-    if: github.ref == 'refs/heads/dev'   # Auto run on dev branch push
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -86,11 +132,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+     
       - name: Run Django Tests
         run: python manage.py test
 
