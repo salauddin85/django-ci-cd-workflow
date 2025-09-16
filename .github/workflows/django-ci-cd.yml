@@ -51,7 +51,8 @@ jobs:
             pip install coverage
             coverage run --source='.' manage.py test
             coverage report
-            coverage xml
+            coverage html
+
 
       # -----------------------
       # Upload test logs / artifacts
@@ -60,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-logs-${{ matrix.os }}-${{ matrix.python-version }}-${{ github.run_id }}
-          path: coverage.xml
+          path: htmlcov/
 
   # ---------------------------
   # Job 2: Deploy Production (Blue-Green + Rollback - Dummy Testing)
